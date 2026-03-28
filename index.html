@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSE NDT Reporting App</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@700&display=swap"
+        rel="stylesheet">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #fff;
+            --text-main: #0f172a;
+            --text-heading: #1e293b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background-color: var(--text-heading);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: #fff;
+            padding: 0 1rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-left-color: var(--primary);
+        }
+
+        /* Main Content UI */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+            box-sizing: border-box;
+        }
+
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h3.section-title {
+            margin-top: 0;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-heading);
+        }
+
+        /* Forms */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.875rem;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* Signature Pads */
+        .sig-container {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: #fff;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .sig-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sig-tab {
+            flex: 1;
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            background: #f1f5f9;
+        }
+
+        .sig-tab.active {
+            background: #fff;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sig-body {
+            position: relative;
+            height: 120px;
+        }
+
+        .sig-canvas,
+        .sig-type,
+        .sig-upload {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .sig-canvas {
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .sig-type {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            border: none;
+            outline: none;
+            text-align: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .sig-upload {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sig-upload input[type="file"] {
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .sig-clear {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.7rem;
+            background: #e2e8f0;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* Tables & Inputs */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid var(--border);
+            padding: 0.25rem;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            padding: 0.5rem;
+        }
+
+        .data-table input {
+            width: 100%;
+            border: none;
+            padding: 0.25rem;
+            box-sizing: border-box;
+            text-align: center;
+            background: transparent;
+            font-size: 0.75rem;
+        }
+
+        .data-table input:focus {
+            outline: 1px solid var(--primary);
+            background: #fff;
+        }
+
+        .tr-sub input {
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .tr-sub {
+            background-color: #f1f5f9;
+        }
+
+        /* Preview Area */
+        #preview-area {
+            display: none;
+            background: #525659;
+            min-height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            padding-top: 80px;
+            text-align: center;
+        }
+
+        .preview-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 210;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .preview-toolbar .btn {
+            font-size: 1rem;
+            padding: 0.5rem 1.5rem;
+            margin-left: 1rem;
+        }
+
+        /* Report Print Layout */
+        #report-container {
+            display: inline-block;
+            text-align: left;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            margin: 0 auto 2rem auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            color: #000;
+        }
+
+        .page-content {
+            padding: 50mm 10mm 45mm 10mm;
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .report-header-img {
+            position: absolute;
+            top: 5mm;
+            left: 10mm;
+            width: calc(100% - 20mm);
+            height: auto;
+            max-height: 40mm;
+            object-fit: contain;
+            z-index: 1;
+        }
+
+        .report-footer-img {
+            position: absolute;
+            bottom: 5mm;
+            left: 10mm;
+            width: calc(100% - 20mm);
+            height: auto;
+            max-height: 35mm;
+            object-fit: contain;
+            z-index: 1;
+        }
+
+        /* Common Page Styling */
+        .report-title-section {
+            text-align: center;
+            margin-bottom: 5px;
+            position: relative;
+            min-height: 55px;
+            flex-shrink: 0;
+        }
+
+        .report-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 0;
+        }
+
+        .top-right-meta {
+            position: absolute;
+            top: 0;
+            right: 0;
+            text-align: right;
+            line-height: 1.2;
+            font-size: 10px;
+        }
+
+        .top-right-meta table {
+            width: auto;
+            border-collapse: collapse;
+            margin-left: auto;
+        }
+
+        .top-right-meta table td {
+            padding: 1px 3px;
+            font-weight: bold;
+        }
+
+        .report-body {
+            border: 2px solid #000;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            font-size: 11px;
+        }
+
+        .report-section {
+            padding: 8px 10px;
+            border-bottom: 2px solid #000;
+        }
+
+        .report-section.flex-fill {
+            flex: 1;
+        }
+
+        .box-row {
+            display: flex;
+            min-height: 22px;
+        }
+
+        .col-full {
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .label-span {
+            width: 220px;
+            text-transform: uppercase;
+            font-weight: normal;
+            flex-shrink: 0;
+        }
+
+        .colon-span {
+            width: 15px;
+            font-weight: normal;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .val-span {
+            font-weight: normal;
+            flex: 1;
+            white-space: pre-wrap;
+            margin-left: 5px;
+        }
+
+        /* Signatures Grid */
+        .sig-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            border: 2px solid #000;
+            text-align: left;
+        }
+
+        .report-body .sig-grid {
+            border: none;
+        }
+
+        .sig-col {
+            border-right: 2px solid #000;
+            display: flex;
+            flex-direction: column;
+            padding: 4px 8px;
+            font-size: 10px;
+            min-height: 120px;
+        }
+
+        .sig-col:last-child {
+            border-right: none;
+        }
+
+        .sig-role {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .sig-name {
+            margin-bottom: auto;
+        }
+
+        .sig-img-box {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 0;
+        }
+
+        .sig-img-box img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .sig-date {
+            border-top: 1px dotted #ccc;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+
+        /* Page 2 Table */
+        .p2-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 9px;
+        }
+
+        .p2-table th,
+        .p2-table td {
+            border: 1px solid #000;
+            padding: 3px;
+            word-break: break-word;
+        }
+
+        .p2-table th {
+            font-weight: bold;
+        }
+
+        /* Fixed bottom signatures for Page 2 */
+        .pg-bottom {
+            position: absolute;
+            bottom: 45mm;
+            left: 10mm;
+            right: 10mm;
+        }
+
+        @media print {
+            body {
+                background: transparent;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            #preview-area {
+                position: relative;
+                padding: 0;
+                background: transparent;
+                display: block !important;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
+            }
+        }
+
+        /* Generic Loader */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar no-print">
+        <h2>MSE Reporting</h2>
+        <a class="nav-link active" onclick="switchTab('data-entry', this)">📝 Report Details</a>
+        <a class="nav-link" onclick="switchTab('table-entry', this)">📊 Measurements (Pg 2)</a>
+        <a class="nav-link" onclick="switchTab('signatures-entry', this)">✍️ Signatures</a>
+        <a class="nav-link" onclick="generatePreview(this)">👁️ Preview & Export</a>
+        <div style="padding: 2rem 1.5rem; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div class="form-group">
+                <label style="color: #cbd5e1; font-size: 0.75rem;">Google App Script URL (For Save)</label>
+                <input type="text" id="r_script_url" class="form-control" style="font-size: 0.75rem;"
+                    placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN FORM AREA -->
+    <div class="main-content no-print" id="form-views">
+
+        <!-- Tab: Details -->
+        <div id="data-entry" class="view-panel active">
+            <div class="card">
+                <h3 class="section-title">Report Metadata</h3>
+                <div class="grid-3">
+                    <div class="form-group"><label>REPORT NO</label><input type="text" id="r_rep_no"
+                            class="form-control"></div>
+                    <div class="form-group"><label>MSE/REF/NO</label><input type="text" id="r_ref_no"
+                            class="form-control"></div>
+                    <div class="form-group"><label>DATE</label><input type="date" id="r_date" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">General Information</h3>
+                <div class="grid-2">
+                    <div class="form-group"><label>OWNER</label><input type="text" id="r_owner" class="form-control">
+                    </div>
+                    <div class="form-group"><label>CLIENT</label><input type="text" id="r_client" class="form-control">
+                    </div>
+                    <div class="form-group"><label>CUSTOMER</label><input type="text" id="r_customer"
+                            class="form-control"></div>
+                    <div class="form-group"><label>LOCATION</label><input type="text" id="r_location"
+                            class="form-control"></div>
+                    <div class="form-group"><label>PROJECT TITLE</label><input type="text" id="r_proj_title"
+                            class="form-control"></div>
+                    <div class="form-group"><label>JOB NO</label><input type="text" id="r_job_no" class="form-control">
+                    </div>
+                    <div class="form-group"><label>TIE IN NO</label><input type="text" id="r_tie_in"
+                            class="form-control"></div>
+                    <div class="form-group"><label>TEST PROCEDURE / DOC NO</label><input type="text" id="r_test_proc"
+                            class="form-control"></div>
+                    <div class="form-group"><label>ACCEPTANCE SPEC</label><input type="text" id="r_acc_spec"
+                            class="form-control"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Test Details</h3>
+                <div class="grid-2">
+                    <div class="form-group"><label>TEST METHOD</label><input type="text" id="r_test_method"
+                            class="form-control" value="VISIBLE WET CONTINUOUS METHOD"></div>
+                    <div class="form-group"><label>EQUIPMENT</label><input type="text" id="r_equip"
+                            class="form-control"></div>
+                    <div class="form-group"><label>POLE SPACING</label><input type="text" id="r_pole"
+                            class="form-control"></div>
+                    <div class="form-group"><label>CALIBRATION</label><input type="text" id="r_calib"
+                            class="form-control"></div>
+                    <div class="form-group"><label>SURFACE CONDITION</label><input type="text" id="r_surf_cond"
+                            class="form-control"></div>
+                    <div class="form-group"><label>MATERIAL</label><input type="text" id="r_mat" class="form-control">
+                    </div>
+                    <div class="form-group"><label>SURFACE TEMPERATURE</label><input type="text" id="r_surf_temp"
+                            class="form-control"></div>
+                    <div class="form-group"><label>CONTRAST PAINT</label><input type="text" id="r_contrast"
+                            class="form-control"></div>
+                    <div class="form-group"><label>MAGNETIC INK</label><input type="text" id="r_ink"
+                            class="form-control"></div>
+                    <div class="form-group"><label>METHOD OF PARTICLE APPLICATION</label><input type="text"
+                            id="r_particle_app" class="form-control" value="Spraying"></div>
+                    <div class="form-group"><label>LIGHT METER SERIAL NO</label><input type="text" id="r_light"
+                            class="form-control"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Findings</h3>
+                <div class="form-group">
+                    <label>SCOPE OF EXAMINATION</label>
+                    <textarea id="r_scope" class="form-control"
+                        rows="2">Tested location please refer to the attached data & drawing sheets.</textarea>
+                </div>
+                <div class="form-group">
+                    <label>FINDINGS</label>
+                    <textarea id="r_findings" class="form-control" rows="3">No relevant indications were detected at the time of testing.
+Item tested were found complied to specification.</textarea>
+                </div>
+            </div>
+
+            <div style="text-align: right;">
+                <button class="btn btn-primary" onclick="document.querySelectorAll('.nav-link')[1].click()">Next: Data
+                    Grid ➡️</button>
+            </div>
+        </div>
+
+        <!-- Tab: Table -->
+        <div id="table-entry" class="view-panel">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h3 class="section-title" style="margin:0; border:none; padding:0;">Measurements Table (Page 2)</h3>
+                    <div>
+                        <button class="btn btn-secondary" onclick="addDataColumn()">+ Data Column</button>
+                        <button class="btn btn-secondary" onclick="addTableRow('sub')">+ Sub-Header Row</button>
+                        <button class="btn btn-primary" onclick="addTableRow('data')">+ Data Row</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="dataTableWrapper">
+                        <thead id="data_thead">
+                            <!-- Populated dynamically by javascript -->
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <!-- JS populated rows go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <button class="btn btn-secondary" onclick="document.querySelectorAll('.nav-link')[0].click()">⬅️
+                    Back</button>
+                <button class="btn btn-primary" onclick="document.querySelectorAll('.nav-link')[2].click()">Next:
+                    Signatures ➡️</button>
+            </div>
+        </div>
+
+        <!-- Tab: Signatures -->
+        <div id="signatures-entry" class="view-panel">
+            <div class="card">
+                <h3 class="section-title">Signatures Block</h3>
+                <div class="grid-2">
+                    <!-- Configured dynamically by JS -->
+                    <div id="sig_block_1"></div>
+                    <div id="sig_block_2"></div>
+                    <div id="sig_block_3"></div>
+                    <div id="sig_block_4"></div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <button class="btn btn-secondary" onclick="document.querySelectorAll('.nav-link')[1].click()">⬅️
+                    Back</button>
+                <button class="btn btn-success" onclick="document.querySelectorAll('.nav-link')[3].click()">👁️ Generate
+                    Report Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW AREA -->
+    <div id="preview-area">
+        <div class="preview-toolbar">
+            <div style="color:white; font-weight:bold; font-size:1.2rem;">Report Preview</div>
+            <div>
+                <button class="btn btn-secondary" onclick="closePreview()">✖ Close</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">📄 Download PDF</button>
+                <button class="btn btn-primary" onclick="downloadWord()">📝 Download Word</button>
+                <button class="btn btn-success" onclick="saveToDrive()">💾 Save to Google Drive</button>
+            </div>
+        </div>
+
+        <div id="report-container">
+            <!-- PAGE 1 -->
+            <div class="page" id="page1">
+                <img src="header logo.png" class="report-header-img" onerror="this.style.display='none'">
+                <div class="page-content">
+                    <!-- Main Report Body spanning the full page -->
+                    <div class="report-body" style="margin-top: 5px;">
+                        <div class="report-title-section" style="padding-top: 15px;">
+                            <h2 class="report-title" style="margin: 0; padding-bottom: 5px;">MAGNETIC PARTICLE TEST REPORT</h2>
+                            <div class="top-right-meta" style="top: 15px; right: 10px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">REPORT NO :</td>
+                                        <td style="text-align: left; width: 100%;"><span id="p1_rep_no"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">MSE/REF/NO :</td>
+                                        <td style="text-align: left;"><span id="p1_ref_no"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">DATE :</td>
+                                        <td style="text-align: left;"><span id="p1_date"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">PAGE :</td>
+                                        <td style="text-align: left;">1 OF 2</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top Information Section -->
+                        <div class="report-section" style="border-top: none;">
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">OWNER</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_owner"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">CLIENT</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_client"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">CUSTOMER</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_customer"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">LOCATION</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_location"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">PROJECT TITLE</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_proj_title"></span>
+                                </div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">JOB NO</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_job_no"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">TIE IN NO</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_tie_in"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">TEST PROCEDURE / DOC NO</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_test_proc"></span>
+                                </div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">ACCEPTANCE SPEC</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_acc_spec"></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Middle Technical Details Section -->
+                        <div class="report-section">
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">TEST METHOD</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_test_method"></span>
+                                </div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">EQUIPMENT</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_equip"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">POLE SPACING</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_pole"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">CALIBRATION</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_calib"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">SURFACE CONDITION</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_surf_cond"></span>
+                                </div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">MATERIAL</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_mat"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">SURFACE TEMPERATURE</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_surf_temp"></span>
+                                </div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">CONTRAST PAINT</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_contrast"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">MAGNETIC INK</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_ink"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">METHOD OF PARTICLE
+                                        APPLICATION</span><span class="colon-span">:</span><span class="val-span"
+                                        id="p1_particle_app"></span></div>
+                            </div>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">LIGHT METER SERIAL NO</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_light"></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Flexible Section -->
+                        <div class="report-section flex-fill">
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">SCOPE OF EXAMINATION</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_scope"></span></div>
+                            </div>
+                            <br>
+                            <div class="box-row">
+                                <div class="col-full"><span class="label-span">FINDINGS</span><span
+                                        class="colon-span">:</span><span class="val-span" id="p1_findings"></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Signatures Pg1 -->
+                        <div class="sig-grid" style="border: none;">
+                            <div class="sig-col">
+                                <div class="sig-role">Tested and Reported By :</div>
+                                <div class="sig-name" id="p1_s1_name"></div>
+                                <div class="sig-img-box"><img id="p1_s1_img" src=""></div>
+                                <div class="sig-date">TESTED DATE : <span id="p1_s1_date"></span></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-role">Reviewed by :</div>
+                                <div class="sig-name" id="p1_s2_name"></div>
+                                <div class="sig-img-box"><img id="p1_s2_img" src=""></div>
+                                <div class="sig-date">DATE : <span id="p1_s2_date"></span></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-role">Reviewed & Witnessed By :</div>
+                                <div class="sig-name" id="p1_s3_name"></div>
+                                <div class="sig-img-box"><img id="p1_s3_img" src=""></div>
+                                <div class="sig-date">DATE : <span id="p1_s3_date"></span></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-role">Reviewed & Witnesd By :</div>
+                                <div class="sig-name" id="p1_s4_name"></div>
+                                <div class="sig-img-box"><img id="p1_s4_img" src=""></div>
+                                <div class="sig-date">DATE : <span id="p1_s4_date"></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <img src="footer logo.png" class="report-footer-img" onerror="this.style.display='none'">
+            </div>
+
+            <!-- PAGE 2 -->
+            <div class="page" id="page2">
+                <img src="header logo.png" class="report-header-img" onerror="this.style.display='none'">
+                <div class="page-content">
+                    <!-- Main Report Body spanning the full page -->
+                    <div class="report-body" style="margin-top: 5px; display:flex; flex-direction:column; flex:1;">
+                        <div class="report-title-section" style="min-height: auto; padding: 5px 0; border-bottom: 1px solid #000;">
+                            <h2 class="report-title" style="margin-bottom: 0;">MAGNETIC PARTICLE TEST REPORT</h2>
+                        </div>
+                        <div class="top-right-meta"
+                            style="width:100%; position:relative; display:flex; justify-content:space-between; padding: 4px 10px; border-bottom: 2px solid #000; box-sizing: border-box;">
+                            <div style="font-weight:bold;">REPORT NO : <span id="p2_rep_no"></span></div>
+                            <div style="font-weight:bold;">PAGE : 2 OF 2</div>
+                        </div>
+
+                        <div style="flex: 1; display:flex; flex-direction:column;">
+                            <table class="p2-table" id="p2_gen_table" style="margin-top: 0; border: none; border-bottom: 2px solid #000;">
+                                <thead>
+                                    <!-- Populated dynamically via cloning dataTableWrapper thead -->
+                                </thead>
+                                <tbody id="p2_table_body" style="vertical-align: top;">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Signatures Pg2 -->
+                        <div class="sig-grid" style="border: none; border-top: 2px solid #000;">
+                            <div class="sig-col">
+                                <div class="sig-role">Tested and Reported By :</div>
+                                <div class="sig-name" id="p2_s1_name"></div>
+                                <div class="sig-img-box"><img id="p2_s1_img" src=""></div>
+                                <div class="sig-date">TESTED DATE : <span id="p2_s1_date"></span></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-role">Reviewed by :</div>
+                                <div class="sig-name" id="p2_s2_name"></div>
+                                <div class="sig-img-box"><img id="p2_s2_img" src=""></div>
+                                <div class="sig-date">DATE : <span id="p2_s2_date"></span></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-role">Reviewed & Witnessed By :</div>
+                                <div class="sig-name" id="p2_s3_name"></div>
+                                <div class="sig-img-box"><img id="p2_s3_img" src=""></div>
+                                <div class="sig-date">DATE : <span id="p2_s3_date"></span></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-role">Reviewed & Witnesd By :</div>
+                                <div class="sig-name" id="p2_s4_name"></div>
+                                <div class="sig-img-box"><img id="p2_s4_img" src=""></div>
+                                <div class="sig-date">DATE : <span id="p2_s4_date"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <img src="footer logo.png" class="report-footer-img" onerror="this.style.display='none'">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <h3 style="margin-top:20px;">Processing...</h3>
+    </div>
+
+    <script>
+        // System Config
+        const pads = [];
+        const sigData = [
+            { title: "Tested and Reported By :", defName: "MSE NDT LEVEL II" },
+            { title: "Reviewed by :", defName: "MSE ASNT NDT Level III" },
+            { title: "Reviewed & Witnessed By :", defName: "CLIENT" },
+            { title: "Reviewed & Witnesd By :", defName: "" }
+        ];
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            setupSignatureBlocks();
+            addTableRow('data'); // Add one demo row
+        });
+
+        // Navigation
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (el) {
+                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            // Handle Signature Pad resize when tab becomes visible
+            if (tabId === 'signatures-entry') {
+                // We use a tiny timeout to ensure the DOM has finished painting the display:block layout
+                setTimeout(() => {
+                    for (let i = 1; i <= 4; i++) {
+                        if (pads[i] && pads[i]._canvas && pads[i]._canvas.style.display !== 'none') {
+                            resizeCanvas(pads[i]._canvas, pads[i]);
+                        }
+                    }
+                }, 50);
+            }
+        }
+
+        // The core fix for "cursor not matching ink"
+        function resizeCanvas(canvas, pad) {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const w = canvas.offsetWidth;
+            const h = canvas.offsetHeight;
+            if (w === 0) return; // Not visible
+            
+            // Only resize if physically changed
+            if (canvas.width !== w * ratio || canvas.height !== h * ratio) {
+                const data = pad.isEmpty() ? null : pad.toDataURL();
+                canvas.width = w * ratio;
+                canvas.height = h * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                pad.clear();
+                if (data) {
+                    pad.fromDataURL(data);
+                }
+            }
+        }
+        
+        window.addEventListener('resize', () => {
+            if(document.getElementById('signatures-entry').classList.contains('active')) {
+                for (let i = 1; i <= 4; i++) {
+                    if (pads[i] && pads[i]._canvas && pads[i]._canvas.style.display !== 'none') {
+                        resizeCanvas(pads[i]._canvas, pads[i]);
+                    }
+                }
+            }
+        });
+
+        // Signatures Setup Engine
+        function setupSignatureBlocks() {
+            sigData.forEach((s, i) => {
+                const idx = i + 1;
+                const html = `
+                <div class="form-group">
+                    <label>${idx}. ${s.title}</label>
+                    <input type="text" id="sig${idx}_name" class="form-control" value="${s.defName}" placeholder="Name / Title" style="margin-bottom:5px;">
+                    <input type="text" id="sig${idx}_date" class="form-control" placeholder="DD-MM-YYYY or Date" style="margin-bottom:5px;">
+                    <div class="sig-container">
+                        <div class="sig-tabs">
+                            <div class="sig-tab active" onclick="switchSigTab(${idx}, 'draw')">Draw</div>
+                            <div class="sig-tab" onclick="switchSigTab(${idx}, 'type')">Type</div>
+                            <div class="sig-tab" onclick="switchSigTab(${idx}, 'upload')">Upload</div>
+                        </div>
+                        <div class="sig-body">
+                            <canvas id="pad${idx}" class="sig-canvas" style="display:block;"></canvas>
+                            <input type="text" id="type${idx}" class="sig-type" placeholder="Type name...">
+                            <div id="upload${idx}" class="sig-upload" style="display:flex; display:none;">
+                                <label style="font-size:0.8rem;color:#666;">Select Image File</label>
+                                <input type="file" id="file${idx}" accept="image/*" onchange="previewUpload(this, ${idx})">
+                            </div>
+                            <div class="sig-tools" style="position:absolute; bottom:5px; right:5px; z-index:10; display:flex; gap:5px; align-items:center;">
+                                <select id="color${idx}" onchange="changeColor(${idx}, this.value)" style="font-size:0.75rem; padding: 2px;">
+                                    <option value="black">Black Ink</option>
+                                    <option value="blue">Blue Ink</option>
+                                </select>
+                                <button class="sig-clear" onclick="clearPad(${idx})" style="position:static;">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+                document.getElementById(`sig_block_${idx}`).innerHTML = html;
+
+                // Init library
+                const canvas = document.getElementById(`pad${idx}`);
+                // Initial size as a placeholder, will resize on tab switch
+                canvas.width = 300;
+                canvas.height = 120;
+                pads[idx] = new SignaturePad(canvas, { backgroundColor: 'rgba(255, 255, 255, 0)' });
+            });
+        }
+
+        function changeColor(idx, color) {
+            pads[idx].penColor = color;
+            document.getElementById("type" + idx).style.color = color;
+        }
+
+        function switchSigTab(idx, mode) {
+            const container = document.getElementById(`sig_block_${idx}`);
+            container.querySelectorAll('.sig-tab').forEach(t => t.classList.remove('active'));
+            if (mode === 'draw') container.querySelectorAll('.sig-tab')[0].classList.add('active');
+            if (mode === 'type') container.querySelectorAll('.sig-tab')[1].classList.add('active');
+            if (mode === 'upload') container.querySelectorAll('.sig-tab')[2].classList.add('active');
+
+            document.getElementById(`pad${idx}`).style.display = mode === 'draw' ? 'block' : 'none';
+            document.getElementById(`type${idx}`).style.display = mode === 'type' ? 'block' : 'none';
+
+            let upl = document.getElementById(`upload${idx}`);
+            if (mode === 'upload') {
+                upl.style.display = 'flex';
+            } else {
+                upl.style.display = 'none';
+            }
+            
+            // Perform instant resize if we just switched to 'draw' to fix offsets
+            if (mode === 'draw' && pads[idx] && pads[idx]._canvas) {
+                 setTimeout(() => resizeCanvas(pads[idx]._canvas, pads[idx]), 10);
+            }
+        }
+
+        function clearPad(idx) {
+            pads[idx].clear();
+            document.getElementById(`type${idx}`).value = '';
+            document.getElementById(`file${idx}`).value = '';
+        }
+
+        function getSignatureData(idx) {
+            const container = document.getElementById(`sig_block_${idx}`);
+            const tabs = container.querySelectorAll('.sig-tab');
+
+            if (tabs[0].classList.contains('active')) {
+                if (pads[idx].isEmpty()) return "";
+                return pads[idx].toDataURL();
+            } else if (tabs[1].classList.contains('active')) {
+                const txt = document.getElementById(`type${idx}`).value;
+                if (!txt) return "";
+                // Create data URL from text (canvas fallback)
+                let sc = document.createElement("canvas");
+                sc.width = 300; sc.height = 100;
+                let sx = sc.getContext("2d");
+                sx.font = "40px 'Dancing Script'";
+                sx.fillStyle = document.getElementById("color" + idx).value;
+                sx.textAlign = "center";
+                sx.fillText(txt, 150, 60);
+                return sc.toDataURL();
+            } else {
+                const file = document.getElementById(`file${idx}`).files[0];
+                if (file) {
+                    // Return data-attrib cache if set by previewUpload
+                    return document.getElementById(`file${idx}`).dataset.b64 || "";
+                }
+                return "";
+            }
+        }
+
+        function previewUpload(input, idx) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    input.dataset.b64 = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Dynamic Table Logic
+        window.tableCols = [
+            { t: "S/N" }, { t: "WELD NO" }, { t: "REV" }, { t: "SIZE" }, { t: "MATERIAL" },
+            { t: "ROOT", p: "WELDER NO." }, { t: "CAPPING", p: "WELDER NO." },
+            { t: "WPS NO" }, { t: "WELDING PROCESS" }, { t: "WELD TYPE" },
+            { t: "Distance (mm)" }, { t: "Indication" }, { t: "RESULT" }, { t: "REMARKS" }
+        ];
+
+        function renderHeaders() {
+            let htmlAction = '<tr class="no-print">';
+            let htmlMain = '<tr>';
+            let htmlSub = '<tr>';
+            
+            let subRowExists = window.tableCols.some(c => c.p);
+            
+            for(let i=0; i<window.tableCols.length; i++) {
+                htmlAction += `<th style="text-align:center;">
+                    <span title="Insert Left" style="font-size:12px; cursor:pointer;" onclick="insertColAt(${i})">⬅️➕</span> 
+                    <span title="Remove" style="font-size:12px; cursor:pointer; color:red; margin:0 5px;" onclick="removeColAt(${i})">🗑️</span> 
+                    <span title="Insert Right" style="font-size:12px; cursor:pointer;" onclick="insertColAt(${i+1})">➕➡️</span>
+                </th>`;
+            }
+            htmlAction += `<th></th></tr>`;
+            
+            let i = 0;
+            while(i < window.tableCols.length) {
+                let col = window.tableCols[i];
+                if (col.p) {
+                    let span = 1;
+                    while(i + span < window.tableCols.length && window.tableCols[i+span].p === col.p) span++;
+                    htmlMain += `<th colspan="${span}" contenteditable="true" onblur="updateColP(${i}, this.innerText)" style="text-align:center;">${col.p}</th>`;
+                    for(let j=0; j<span; j++) htmlSub += `<th contenteditable="true" onblur="updateColT(${i+j}, this.innerText)">${window.tableCols[i+j].t}</th>`;
+                    i += span;
+                } else {
+                    htmlMain += `<th rowspan="${subRowExists ? 2 : 1}" contenteditable="true" onblur="updateColT(${i}, this.innerText)">${col.t}</th>`;
+                    i++;
+                }
+            }
+            htmlMain += `<th rowspan="${subRowExists ? 2 : 1}" class="del-col">Del</th></tr>`;
+            if (subRowExists) htmlSub += `</tr>`;
+            else htmlSub = '';
+            
+            document.getElementById('data_thead').innerHTML = htmlAction + htmlMain + htmlSub;
+            window.dataColCount = window.tableCols.length;
+        }
+
+        function updateColT(idx, val) { window.tableCols[idx].t = val; }
+        function updateColP(idx, val) { 
+            let p = window.tableCols[idx].p;
+            window.tableCols.forEach(c => { if(c.p === p) c.p = val; });
+        }
+
+        function insertColAt(idx) {
+            window.tableCols.splice(idx, 0, { t: "New Col" });
+            document.querySelectorAll('#dataTableBody tr').forEach(tr => {
+                if(tr.classList.contains('tr-data')) {
+                    const td = document.createElement('td');
+                    td.innerHTML = '<input type="text">';
+                    tr.insertBefore(td, tr.children[idx]);
+                } else if(tr.classList.contains('tr-sub')) {
+                    tr.querySelector('td').colSpan = window.tableCols.length;
+                }
+            });
+            renderHeaders();
+        }
+
+        function removeColAt(idx) {
+            if(window.tableCols.length <= 1) return alert("Cannot remove all columns.");
+            if(!confirm("Remove column " + window.tableCols[idx].t + "?")) return;
+            window.tableCols.splice(idx, 1);
+            document.querySelectorAll('#dataTableBody tr').forEach(tr => {
+                if(tr.classList.contains('tr-data')) tr.removeChild(tr.children[idx]);
+                else if(tr.classList.contains('tr-sub')) tr.querySelector('td').colSpan = window.tableCols.length;
+            });
+            renderHeaders();
+        }
+
+        function addDataColumn() { insertColAt(window.tableCols.length); }
+        
+        // Initial setup
+        renderHeaders();
+
+        function addTableRow(type) {
+            const tbody = document.getElementById('dataTableBody');
+            const tr = document.createElement('tr');
+            if (type === 'sub') {
+                tr.className = 'tr-sub';
+                tr.innerHTML = `
+                <td colspan="${window.dataColCount}" style="text-align:left; padding:4px;">
+                    <div style="display:flex; justify-content:space-between; gap:1rem;">
+                        <input type="text" placeholder="DRAWING NO :" style="width:33%;">
+                        <input type="text" placeholder="WPS NO :" style="width:33%;">
+                        <input type="text" placeholder="PIPE CLASS :" style="width:33%;">
+                    </div>
+                </td>
+                <td><button type="button" onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:red;cursor:pointer;">✖</button></td>
+            `;
+            } else {
+                tr.className = 'tr-data';
+                let cells = '';
+                for (let i = 0; i < window.dataColCount; i++) {
+                    cells += `<td><input type="text"></td>`;
+                }
+                tr.innerHTML = cells + `<td><button type="button" onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:red;cursor:pointer;">✖</button></td>`;
+            }
+            tbody.appendChild(tr);
+        }
+
+        // Preview Generator
+        function generatePreview() {
+            document.getElementById('preview-area').style.display = 'block';
+
+            // Helper to format date if user enters standard format
+            const formatDt = (v) => v ? v.split('-').reverse().join('-') : ''; // simple DD-MM-YYYY attempt or raw string
+
+            // Fill Page 1
+            const fields = ['rep_no', 'ref_no', 'owner', 'client', 'customer', 'location',
+                'job_no', 'tie_in', 'test_proc', 'acc_spec', 'test_method',
+                'equip', 'pole', 'calib', 'surf_cond', 'mat', 'surf_temp',
+                'contrast', 'ink', 'particle_app', 'light', 'scope', 'findings'];
+
+            fields.forEach(f => {
+                const el = document.getElementById('p1_' + f);
+                const valEl = document.getElementById('r_' + f);
+                if (el && valEl) el.innerText = valEl.value;
+            });
+
+            // Special mappings
+            document.getElementById('p1_date').innerText = formatDt(document.getElementById('r_date').value);
+            document.getElementById('p1_proj_title').innerText = document.getElementById('r_proj_title').value;
+
+            // Fill Signatures Page 1 & 2
+            for (let i = 1; i <= 4; i++) {
+                const nm = document.getElementById(`sig${i}_name`).value;
+                const dt = document.getElementById(`sig${i}_date`).value;
+                const img = getSignatureData(i);
+
+                ['p1', 'p2'].forEach(pg => {
+                    document.getElementById(`${pg}_s${i}_name`).innerHTML = nm.replace(/\n/g, '<br>');
+                    document.getElementById(`${pg}_s${i}_date`).innerText = dt; // allow exact input
+                    const imgEl = document.getElementById(`${pg}_s${i}_img`);
+                    if (img) {
+                        imgEl.src = img;
+                        imgEl.style.display = 'block';
+                    } else {
+                        imgEl.style.display = 'none';
+                    }
+                });
+            }
+
+            // Fill Page 2 Metadata
+            document.getElementById('p2_rep_no').innerText = document.getElementById('r_rep_no').value;
+
+            // Generate Page 2 Table
+            const tbDest = document.getElementById('p2_table_body');
+            tbDest.innerHTML = '';
+
+            // Synchronize PDF header with Dynamic Data table header
+            const pdfThead = document.querySelector('#p2_gen_table thead');
+            const dataTheadSrc = document.querySelector('#dataTableWrapper thead');
+            pdfThead.innerHTML = dataTheadSrc.innerHTML;
+            
+            // Clean up PDF headers
+            pdfThead.querySelectorAll('tr.no-print').forEach(r => r.remove());
+            pdfThead.querySelectorAll('th').forEach((th, idx) => {
+                th.removeAttribute('contenteditable');
+                th.style.borderTop = 'none'; 
+                th.style.verticalAlign = 'middle';
+                if (th.innerText.trim() === 'S/N') th.style.borderLeft = 'none';
+                if (th.classList.contains('del-col')) th.remove();
+            });
+            
+            const tbSrc = document.getElementById('dataTableBody');
+
+            Array.from(tbSrc.children).forEach(r => {
+                const tr = document.createElement('tr');
+                if (r.classList.contains('tr-sub')) {
+                    tr.className = 'p2-heading-row';
+                    const inputs = r.querySelectorAll('input');
+                    const t1 = inputs[0] ? inputs[0].value : '';
+                    const t2 = inputs[1] ? inputs[1].value : '';
+                    const t3 = inputs[2] ? inputs[2].value : '';
+
+                    tr.innerHTML = `
+                        <td colspan="7" style="text-align:left; font-weight:bold; border-bottom:1px solid #000; border-right:1px solid #000; border-left:none; padding:3px;">DRAWING NO : ${t1}</td>
+                        <td colspan="5" style="text-align:left; font-weight:bold; border-bottom:1px solid #000; border-right:1px solid #000; padding:3px;">WPS NO : ${t2}</td>
+                        <td colspan="${window.dataColCount - 12}" style="text-align:left; font-weight:bold; border-bottom:1px solid #000; border-right:none; padding:3px;">PIPE CLASS : ${t3}</td>
+                    `;
+                } else {
+                    const inputs = r.querySelectorAll('input');
+                    let rowHtml = '';
+                    for (let k = 0; k < window.dataColCount; k++) {
+                        const tv = inputs[k] ? inputs[k].value : '';
+                        let cellStyle = "border-bottom:1px solid #000; padding:3px; word-break:break-word;";
+                        cellStyle += (k === 0) ? " border-left:none;" : " border-left:1px solid #000;";
+                        cellStyle += (k === window.dataColCount - 1) ? " border-right:none;" : " border-right:1px solid #000;";
+                        rowHtml += `<td style="${cellStyle}">${tv}</td>`;
+                    }
+                    tr.innerHTML = rowHtml;
+                }
+                tbDest.appendChild(tr);
+            });
+        }
+
+        function closePreview() {
+            document.getElementById('preview-area').style.display = 'none';
+        }
+
+        // Export Options
+        function downloadPDF() {
+            const d = new Date();
+            const client = document.getElementById('r_client').value.trim() || 'Client';
+            const fn = `${client}_MSE_Report_${d.getDate()}${d.getMonth() + 1}${d.getFullYear()}_${d.getHours()}${d.getMinutes()}.pdf`;
+
+            const opt = {
+                margin: 0,
+                filename: fn,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(document.getElementById('report-container')).save();
+        }
+
+        function downloadWord() {
+            const d = new Date();
+            const client = document.getElementById('r_client').value.trim() || 'Client';
+            const fn = `${client}_MSE_Report.doc`;
+
+            // Simple HTML to Word construct
+            const html = document.getElementById('report-container').outerHTML;
+            const pre = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>`;
+            const post = "</body></html>";
+            const blob = new Blob(['\ufeff', pre + html + post], { type: 'application/msword' });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fn;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Google Drive saving
+        async function saveToDrive() {
+            const gasUrl = document.getElementById('r_script_url').value.trim();
+            if (!gasUrl) {
+                alert("Please provide the Google Apps Script Web App URL in the sidebar configuration first.");
+                return;
+            }
+
+            const d = new Date();
+            const client = document.getElementById('r_client').value.trim() || 'Client';
+            const fn = `${client}_Report_${d.getTime()}.pdf`;
+
+            // Generate base64 PDF
+            showLoader();
+            const opt = {
+                margin: 0, filename: fn,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                const pdfBlobString = await html2pdf().set(opt).from(document.getElementById('report-container')).outputPdf('datauristring');
+
+                const payload = {
+                    fileBase64: pdfBlobString,
+                    fileName: fn,
+                    fileType: "application/pdf"
+                };
+
+                const response = await fetch(gasUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, // use text/plain to avoid CORS preflight error if not setup correctly in GAS app
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                hideLoader();
+                if (result.status === 'success') {
+                    alert("Saved to Google Drive Successfully!");
+                } else {
+                    alert("Failed to save: " + result.message);
+                }
+            } catch (error) {
+                hideLoader();
+                alert("Error connecting to script: " + error.message);
+            }
+        }
+
+        function showLoader() { document.getElementById('loader').style.display = 'flex'; }
+        function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+
+    </script>
+</body>
+
+</html>
