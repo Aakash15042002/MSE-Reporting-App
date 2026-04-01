@@ -510,7 +510,7 @@
         }
 
         .label-cell {
-            width: 180px;
+            width: 220px;
             text-transform: uppercase;
         }
 
@@ -521,6 +521,7 @@
 
         .value-cell {
             font-weight: normal;
+            white-space: pre-wrap;
         }
 
         /* Signatures Table */
@@ -1480,18 +1481,22 @@ Item tested were found complied to specification.</textarea>
             const pages = document.querySelectorAll('.page');
             const originalMargins = [];
             
-            // Aggressively remove all possible spacing
+            // Use Flex strategy to eliminate whitespace gaps
             const originalContainerStyle = {
-                lineHeight: container.style.lineHeight,
-                fontSize: container.style.fontSize
+                display: container.style.display,
+                flexDirection: container.style.flexDirection,
+                gap: container.style.gap,
+                width: container.style.width
             };
-            container.style.lineHeight = '0';
-            container.style.fontSize = '0';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '0';
+            container.style.width = '210mm'; // Lock width
 
             pages.forEach((p, i) => {
                 originalMargins[i] = p.style.marginBottom;
                 p.style.marginBottom = '0';
-                p.style.display = 'block';
+                p.style.pageBreakAfter = 'always';
             });
 
             const opt = {
@@ -1505,8 +1510,10 @@ Item tested were found complied to specification.</textarea>
             
             html2pdf().set(opt).from(container).save().then(() => {
                 // Restore
-                container.style.lineHeight = originalContainerStyle.lineHeight;
-                container.style.fontSize = originalContainerStyle.fontSize;
+                container.style.display = originalContainerStyle.display;
+                container.style.flexDirection = originalContainerStyle.flexDirection;
+                container.style.gap = originalContainerStyle.gap;
+                container.style.width = originalContainerStyle.width;
                 pages.forEach((p, i) => {
                     p.style.marginBottom = originalMargins[i];
                 });
@@ -1648,22 +1655,25 @@ Item tested were found complied to specification.</textarea>
             // Generate base64 PDF
             showLoader();
             try {
-                // Prepare for PDF export: remove margins
+                // Prepare for PDF export
                 const container = document.getElementById('report-container');
                 const pages = document.querySelectorAll('.page');
                 const originalMargins = [];
                 
                 const originalContainerStyle = {
-                    lineHeight: container.style.lineHeight,
-                    fontSize: container.style.fontSize
+                    display: container.style.display,
+                    flexDirection: container.style.flexDirection,
+                    gap: container.style.gap,
+                    width: container.style.width
                 };
-                container.style.lineHeight = '0';
-                container.style.fontSize = '0';
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.gap = '0';
+                container.style.width = '210mm';
 
                 pages.forEach((p, i) => {
                     originalMargins[i] = p.style.marginBottom;
                     p.style.marginBottom = '0';
-                    p.style.display = 'block';
                 });
 
                 const opt = {
@@ -1677,8 +1687,10 @@ Item tested were found complied to specification.</textarea>
                 const pdfBlobString = await html2pdf().set(opt).from(container).outputPdf('datauristring');
 
                 // Restore
-                container.style.lineHeight = originalContainerStyle.lineHeight;
-                container.style.fontSize = originalContainerStyle.fontSize;
+                container.style.display = originalContainerStyle.display;
+                container.style.flexDirection = originalContainerStyle.flexDirection;
+                container.style.gap = originalContainerStyle.gap;
+                container.style.width = originalContainerStyle.width;
                 pages.forEach((p, i) => {
                     p.style.marginBottom = originalMargins[i];
                 });
