@@ -1006,10 +1006,7 @@ Item tested were found complied to specification.</textarea>
 
                 </div>
                 <img src="footer logo.png" class="report-footer-img" onerror="this.style.display='none'">
-            </div>
-
-            <!-- PAGE 2 -->
-            <div class="page" id="page2">
+            </div><div class="page" id="page2">
                 <img src="header logo.png" class="report-header-img" onerror="this.style.display='none'">
                 <div class="page-content">
                     <!-- Main Report Body spanning the full page -->
@@ -1478,12 +1475,23 @@ Item tested were found complied to specification.</textarea>
             const client = document.getElementById('r_client').value.trim() || 'Client';
             const fn = `${client}_MSE_Report_${d.getDate()}${d.getMonth() + 1}${d.getFullYear()}_${d.getHours()}${d.getMinutes()}.pdf`;
 
-            // Prepare for PDF export: remove margins
+            // Prepare for PDF export
+            const container = document.getElementById('report-container');
             const pages = document.querySelectorAll('.page');
             const originalMargins = [];
+            
+            // Aggressively remove all possible spacing
+            const originalContainerStyle = {
+                lineHeight: container.style.lineHeight,
+                fontSize: container.style.fontSize
+            };
+            container.style.lineHeight = '0';
+            container.style.fontSize = '0';
+
             pages.forEach((p, i) => {
                 originalMargins[i] = p.style.marginBottom;
                 p.style.marginBottom = '0';
+                p.style.display = 'block';
             });
 
             const opt = {
@@ -1495,8 +1503,10 @@ Item tested were found complied to specification.</textarea>
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
             
-            html2pdf().set(opt).from(document.getElementById('report-container')).save().then(() => {
-                // Restore margins for preview
+            html2pdf().set(opt).from(container).save().then(() => {
+                // Restore
+                container.style.lineHeight = originalContainerStyle.lineHeight;
+                container.style.fontSize = originalContainerStyle.fontSize;
                 pages.forEach((p, i) => {
                     p.style.marginBottom = originalMargins[i];
                 });
@@ -1639,11 +1649,21 @@ Item tested were found complied to specification.</textarea>
             showLoader();
             try {
                 // Prepare for PDF export: remove margins
+                const container = document.getElementById('report-container');
                 const pages = document.querySelectorAll('.page');
                 const originalMargins = [];
+                
+                const originalContainerStyle = {
+                    lineHeight: container.style.lineHeight,
+                    fontSize: container.style.fontSize
+                };
+                container.style.lineHeight = '0';
+                container.style.fontSize = '0';
+
                 pages.forEach((p, i) => {
                     originalMargins[i] = p.style.marginBottom;
                     p.style.marginBottom = '0';
+                    p.style.display = 'block';
                 });
 
                 const opt = {
@@ -1654,9 +1674,11 @@ Item tested were found complied to specification.</textarea>
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
 
-                const pdfBlobString = await html2pdf().set(opt).from(document.getElementById('report-container')).outputPdf('datauristring');
+                const pdfBlobString = await html2pdf().set(opt).from(container).outputPdf('datauristring');
 
-                // Restore margins
+                // Restore
+                container.style.lineHeight = originalContainerStyle.lineHeight;
+                container.style.fontSize = originalContainerStyle.fontSize;
                 pages.forEach((p, i) => {
                     p.style.marginBottom = originalMargins[i];
                 });
