@@ -367,13 +367,18 @@
             width: 210mm;
             height: 297mm;
             background: white;
-            margin: 0 auto 2rem auto;
+            margin: 0 auto;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             position: relative;
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 10px;
             color: #000;
+            overflow: hidden;
+        }
+
+        #report-container .page:not(:last-child) {
+            margin-bottom: 2rem;
         }
 
         .page-content {
@@ -493,59 +498,52 @@
             margin-left: 5px;
         }
 
-        /* Signatures Grid */
-        .sig-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .report-table td {
+            vertical-align: top;
+            padding: 2px 0;
+            font-size: 11px;
+        }
+
+        .label-cell {
+            width: 180px;
+            text-transform: uppercase;
+        }
+
+        .colon-cell {
+            width: 20px;
+            text-align: center;
+        }
+
+        .value-cell {
+            font-weight: normal;
+        }
+
+        /* Signatures Table */
+        .sig-table {
+            width: 100%;
+            border-collapse: collapse;
             border: 2px solid #000;
-            text-align: left;
         }
 
-        .report-body .sig-grid {
-            border: none;
-        }
-
-        .sig-col {
+        .sig-table td {
             border-right: 2px solid #000;
-            display: flex;
-            flex-direction: column;
             padding: 4px 8px;
             font-size: 10px;
             min-height: 120px;
+            width: 25%;
+            vertical-align: top;
         }
 
-        .sig-col:last-child {
+        .sig-table td:last-child {
             border-right: none;
         }
 
-        .sig-role {
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-
-        .sig-name {
-            margin-bottom: auto;
-        }
-
-        .sig-img-box {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 2px 0;
-        }
-
-        .sig-img-box img {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
-        }
-
-        .sig-date {
-            border-top: 1px dotted #ccc;
-            padding-top: 5px;
-            font-weight: bold;
-        }
+        /* Moved to sig-table */
 
         /* Page 2 Table */
         .p2-table {
@@ -590,6 +588,10 @@
                 padding: 0;
                 background: transparent;
                 display: block !important;
+            }
+
+            #report-container .page:not(:last-child) {
+                margin-bottom: 0;
             }
 
             .page {
@@ -814,23 +816,28 @@ Item tested were found complied to specification.</textarea>
                     <!-- Main Report Body spanning the full page -->
                     <div class="report-body" style="margin-top: 5px;">
                         <div class="report-title-section" style="padding-top: 15px;">
-                            <h2 class="report-title" style="margin: 0; padding-bottom: 5px;">MAGNETIC PARTICLE TEST REPORT</h2>
+                            <h2 class="report-title" style="margin: 0; padding-bottom: 5px;">MAGNETIC PARTICLE TEST
+                                REPORT</h2>
                             <div class="top-right-meta" style="top: 15px; right: 10px;">
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <tr>
-                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">REPORT NO :</td>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">REPORT
+                                            NO :</td>
                                         <td style="text-align: left; width: 100%;"><span id="p1_rep_no"></span></td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">MSE/REF/NO :</td>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">
+                                            MSE/REF/NO :</td>
                                         <td style="text-align: left;"><span id="p1_ref_no"></span></td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">DATE :</td>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">DATE :
+                                        </td>
                                         <td style="text-align: left;"><span id="p1_date"></span></td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">PAGE :</td>
+                                        <td style="text-align: right; white-space: nowrap; padding-right: 5px;">PAGE :
+                                        </td>
                                         <td style="text-align: left;">1 OF 2</td>
                                     </tr>
                                 </table>
@@ -839,138 +846,162 @@ Item tested were found complied to specification.</textarea>
 
                         <!-- Top Information Section -->
                         <div class="report-section" style="border-top: none;">
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">OWNER</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_owner"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">CLIENT</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_client"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">CUSTOMER</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_customer"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">LOCATION</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_location"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">PROJECT TITLE</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_proj_title"></span>
-                                </div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">JOB NO</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_job_no"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">TIE IN NO</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_tie_in"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">TEST PROCEDURE / DOC NO</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_test_proc"></span>
-                                </div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">ACCEPTANCE SPEC</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_acc_spec"></span></div>
-                            </div>
+                            <table class="report-table">
+                                <tr>
+                                    <td class="label-cell">OWNER</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_owner"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">CLIENT</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_client"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">CUSTOMER</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_customer"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">LOCATION</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_location"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">PROJECT TITLE</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_proj_title"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">JOB NO</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_job_no"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">TIE IN NO</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_tie_in"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">TEST PROCEDURE / DOC NO</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_test_proc"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">ACCEPTANCE SPEC</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_acc_spec"></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <!-- Middle Technical Details Section -->
                         <div class="report-section">
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">TEST METHOD</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_test_method"></span>
-                                </div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">EQUIPMENT</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_equip"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">POLE SPACING</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_pole"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">CALIBRATION</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_calib"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">SURFACE CONDITION</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_surf_cond"></span>
-                                </div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">MATERIAL</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_mat"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">SURFACE TEMPERATURE</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_surf_temp"></span>
-                                </div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">CONTRAST PAINT</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_contrast"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">MAGNETIC INK</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_ink"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">METHOD OF PARTICLE
-                                        APPLICATION</span><span class="colon-span">:</span><span class="val-span"
-                                        id="p1_particle_app"></span></div>
-                            </div>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">LIGHT METER SERIAL NO</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_light"></span></div>
-                            </div>
+                            <table class="report-table">
+                                <tr>
+                                    <td class="label-cell">TEST METHOD</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_test_method"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">EQUIPMENT</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_equip"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">POLE SPACING</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_pole"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">CALIBRATION</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_calib"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">SURFACE CONDITION</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_surf_cond"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">MATERIAL</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_mat"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">SURFACE TEMPERATURE</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_surf_temp"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">CONTRAST PAINT</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_contrast"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">MAGNETIC INK</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_ink"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">METHOD OF PARTICLE APPLICATION</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_particle_app"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label-cell">LIGHT METER SERIAL NO</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_light"></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <!-- Bottom Flexible Section -->
                         <div class="report-section flex-fill">
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">SCOPE OF EXAMINATION</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_scope"></span></div>
-                            </div>
-                            <br>
-                            <div class="box-row">
-                                <div class="col-full"><span class="label-span">FINDINGS</span><span
-                                        class="colon-span">:</span><span class="val-span" id="p1_findings"></span></div>
-                            </div>
+                            <table class="report-table">
+                                <tr>
+                                    <td class="label-cell">SCOPE OF EXAMINATION</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_scope"></td>
+                                </tr>
+                                <tr style="height: 10px;"><td></td></tr>
+                                <tr>
+                                    <td class="label-cell">FINDINGS</td>
+                                    <td class="colon-cell">:</td>
+                                    <td class="value-cell" id="p1_findings"></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <!-- Signatures Pg1 -->
-                        <div class="sig-grid" style="border: none;">
-                            <div class="sig-col">
-                                <div class="sig-role">Tested and Reported By :</div>
-                                <div class="sig-name" id="p1_s1_name"></div>
-                                <div class="sig-img-box"><img id="p1_s1_img" src=""></div>
-                                <div class="sig-date">TESTED DATE : <span id="p1_s1_date"></span></div>
-                            </div>
-                            <div class="sig-col">
-                                <div class="sig-role">Reviewed by :</div>
-                                <div class="sig-name" id="p1_s2_name"></div>
-                                <div class="sig-img-box"><img id="p1_s2_img" src=""></div>
-                                <div class="sig-date">DATE : <span id="p1_s2_date"></span></div>
-                            </div>
-                            <div class="sig-col">
-                                <div class="sig-role">Reviewed & Witnessed By :</div>
-                                <div class="sig-name" id="p1_s3_name"></div>
-                                <div class="sig-img-box"><img id="p1_s3_img" src=""></div>
-                                <div class="sig-date">DATE : <span id="p1_s3_date"></span></div>
-                            </div>
-                            <div class="sig-col">
-                                <div class="sig-role">Reviewed & Witnesd By :</div>
-                                <div class="sig-name" id="p1_s4_name"></div>
-                                <div class="sig-img-box"><img id="p1_s4_img" src=""></div>
-                                <div class="sig-date">DATE : <span id="p1_s4_date"></span></div>
-                            </div>
-                        </div>
+                        <table class="sig-table" style="border: none;">
+                            <tr>
+                                <td>
+                                    <div class="sig-role">Tested and Reported By :</div>
+                                    <div class="sig-name" id="p1_s1_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p1_s1_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">TESTED DATE : <span id="p1_s1_date"></span></div>
+                                </td>
+                                <td>
+                                    <div class="sig-role">Reviewed by :</div>
+                                    <div class="sig-name" id="p1_s2_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p1_s2_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">DATE : <span id="p1_s2_date"></span></div>
+                                </td>
+                                <td>
+                                    <div class="sig-role">Reviewed & Witnessed By :</div>
+                                    <div class="sig-name" id="p1_s3_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p1_s3_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">DATE : <span id="p1_s3_date"></span></div>
+                                </td>
+                                <td>
+                                    <div class="sig-role">Reviewed & Witnesd By :</div>
+                                    <div class="sig-name" id="p1_s4_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p1_s4_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">DATE : <span id="p1_s4_date"></span></div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                 </div>
@@ -983,7 +1014,8 @@ Item tested were found complied to specification.</textarea>
                 <div class="page-content">
                     <!-- Main Report Body spanning the full page -->
                     <div class="report-body" style="margin-top: 5px; display:flex; flex-direction:column; flex:1;">
-                        <div class="report-title-section" style="min-height: auto; padding: 5px 0; border-bottom: 1px solid #000;">
+                        <div class="report-title-section"
+                            style="min-height: auto; padding: 5px 0; border-bottom: 1px solid #000;">
                             <h2 class="report-title" style="margin-bottom: 0;">MAGNETIC PARTICLE TEST REPORT</h2>
                         </div>
                         <div class="top-right-meta"
@@ -993,7 +1025,8 @@ Item tested were found complied to specification.</textarea>
                         </div>
 
                         <div style="flex: 1; display:flex; flex-direction:column;">
-                            <table class="p2-table" id="p2_gen_table" style="margin-top: 0; border: none; border-bottom: 2px solid #000;">
+                            <table class="p2-table" id="p2_gen_table"
+                                style="margin-top: 0; border: none; border-bottom: 2px solid #000;">
                                 <thead>
                                     <!-- Populated dynamically via cloning dataTableWrapper thead -->
                                 </thead>
@@ -1004,32 +1037,34 @@ Item tested were found complied to specification.</textarea>
                         </div>
 
                         <!-- Signatures Pg2 -->
-                        <div class="sig-grid" style="border: none; border-top: 2px solid #000;">
-                            <div class="sig-col">
-                                <div class="sig-role">Tested and Reported By :</div>
-                                <div class="sig-name" id="p2_s1_name"></div>
-                                <div class="sig-img-box"><img id="p2_s1_img" src=""></div>
-                                <div class="sig-date">TESTED DATE : <span id="p2_s1_date"></span></div>
-                            </div>
-                            <div class="sig-col">
-                                <div class="sig-role">Reviewed by :</div>
-                                <div class="sig-name" id="p2_s2_name"></div>
-                                <div class="sig-img-box"><img id="p2_s2_img" src=""></div>
-                                <div class="sig-date">DATE : <span id="p2_s2_date"></span></div>
-                            </div>
-                            <div class="sig-col">
-                                <div class="sig-role">Reviewed & Witnessed By :</div>
-                                <div class="sig-name" id="p2_s3_name"></div>
-                                <div class="sig-img-box"><img id="p2_s3_img" src=""></div>
-                                <div class="sig-date">DATE : <span id="p2_s3_date"></span></div>
-                            </div>
-                            <div class="sig-col">
-                                <div class="sig-role">Reviewed & Witnesd By :</div>
-                                <div class="sig-name" id="p2_s4_name"></div>
-                                <div class="sig-img-box"><img id="p2_s4_img" src=""></div>
-                                <div class="sig-date">DATE : <span id="p2_s4_date"></span></div>
-                            </div>
-                        </div>
+                        <table class="sig-table" style="border: none; border-top: 2px solid #000;">
+                            <tr>
+                                <td>
+                                    <div class="sig-role">Tested and Reported By :</div>
+                                    <div class="sig-name" id="p2_s1_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p2_s1_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">TESTED DATE : <span id="p2_s1_date"></span></div>
+                                </td>
+                                <td>
+                                    <div class="sig-role">Reviewed by :</div>
+                                    <div class="sig-name" id="p2_s2_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p2_s2_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">DATE : <span id="p2_s2_date"></span></div>
+                                </td>
+                                <td>
+                                    <div class="sig-role">Reviewed & Witnessed By :</div>
+                                    <div class="sig-name" id="p2_s3_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p2_s3_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">DATE : <span id="p2_s3_date"></span></div>
+                                </td>
+                                <td>
+                                    <div class="sig-role">Reviewed & Witnesd By :</div>
+                                    <div class="sig-name" id="p2_s4_name"></div>
+                                    <div class="sig-img-box" style="height:50px; display:flex; align-items:center; justify-content:center;"><img id="p2_s4_img" src="" style="max-height:100%; max-width:100%;"></div>
+                                    <div class="sig-date" style="border-top:1px dotted #ccc; padding-top:2px;">DATE : <span id="p2_s4_date"></span></div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
                 <img src="footer logo.png" class="report-footer-img" onerror="this.style.display='none'">
@@ -1088,7 +1123,7 @@ Item tested were found complied to specification.</textarea>
             const w = canvas.offsetWidth;
             const h = canvas.offsetHeight;
             if (w === 0) return; // Not visible
-            
+
             // Only resize if physically changed
             if (canvas.width !== w * ratio || canvas.height !== h * ratio) {
                 const data = pad.isEmpty() ? null : pad.toDataURL();
@@ -1101,9 +1136,9 @@ Item tested were found complied to specification.</textarea>
                 }
             }
         }
-        
+
         window.addEventListener('resize', () => {
-            if(document.getElementById('signatures-entry').classList.contains('active')) {
+            if (document.getElementById('signatures-entry').classList.contains('active')) {
                 for (let i = 1; i <= 4; i++) {
                     if (pads[i] && pads[i]._canvas && pads[i]._canvas.style.display !== 'none') {
                         resizeCanvas(pads[i]._canvas, pads[i]);
@@ -1177,10 +1212,10 @@ Item tested were found complied to specification.</textarea>
             } else {
                 upl.style.display = 'none';
             }
-            
+
             // Perform instant resize if we just switched to 'draw' to fix offsets
             if (mode === 'draw' && pads[idx] && pads[idx]._canvas) {
-                 setTimeout(() => resizeCanvas(pads[idx]._canvas, pads[idx]), 10);
+                setTimeout(() => resizeCanvas(pads[idx]._canvas, pads[idx]), 10);
             }
         }
 
@@ -1241,26 +1276,26 @@ Item tested were found complied to specification.</textarea>
             let htmlAction = '<tr class="no-print">';
             let htmlMain = '<tr>';
             let htmlSub = '<tr>';
-            
+
             let subRowExists = window.tableCols.some(c => c.p);
-            
-            for(let i=0; i<window.tableCols.length; i++) {
+
+            for (let i = 0; i < window.tableCols.length; i++) {
                 htmlAction += `<th style="text-align:center;">
                     <span title="Insert Left" style="font-size:12px; cursor:pointer;" onclick="insertColAt(${i})">⬅️➕</span> 
                     <span title="Remove" style="font-size:12px; cursor:pointer; color:red; margin:0 5px;" onclick="removeColAt(${i})">🗑️</span> 
-                    <span title="Insert Right" style="font-size:12px; cursor:pointer;" onclick="insertColAt(${i+1})">➕➡️</span>
+                    <span title="Insert Right" style="font-size:12px; cursor:pointer;" onclick="insertColAt(${i + 1})">➕➡️</span>
                 </th>`;
             }
             htmlAction += `<th></th></tr>`;
-            
+
             let i = 0;
-            while(i < window.tableCols.length) {
+            while (i < window.tableCols.length) {
                 let col = window.tableCols[i];
                 if (col.p) {
                     let span = 1;
-                    while(i + span < window.tableCols.length && window.tableCols[i+span].p === col.p) span++;
+                    while (i + span < window.tableCols.length && window.tableCols[i + span].p === col.p) span++;
                     htmlMain += `<th colspan="${span}" contenteditable="true" onblur="updateColP(${i}, this.innerText)" style="text-align:center;">${col.p}</th>`;
-                    for(let j=0; j<span; j++) htmlSub += `<th contenteditable="true" onblur="updateColT(${i+j}, this.innerText)">${window.tableCols[i+j].t}</th>`;
+                    for (let j = 0; j < span; j++) htmlSub += `<th contenteditable="true" onblur="updateColT(${i + j}, this.innerText)">${window.tableCols[i + j].t}</th>`;
                     i += span;
                 } else {
                     htmlMain += `<th rowspan="${subRowExists ? 2 : 1}" contenteditable="true" onblur="updateColT(${i}, this.innerText)">${col.t}</th>`;
@@ -1270,25 +1305,25 @@ Item tested were found complied to specification.</textarea>
             htmlMain += `<th rowspan="${subRowExists ? 2 : 1}" class="del-col">Del</th></tr>`;
             if (subRowExists) htmlSub += `</tr>`;
             else htmlSub = '';
-            
+
             document.getElementById('data_thead').innerHTML = htmlAction + htmlMain + htmlSub;
             window.dataColCount = window.tableCols.length;
         }
 
         function updateColT(idx, val) { window.tableCols[idx].t = val; }
-        function updateColP(idx, val) { 
+        function updateColP(idx, val) {
             let p = window.tableCols[idx].p;
-            window.tableCols.forEach(c => { if(c.p === p) c.p = val; });
+            window.tableCols.forEach(c => { if (c.p === p) c.p = val; });
         }
 
         function insertColAt(idx) {
             window.tableCols.splice(idx, 0, { t: "New Col" });
             document.querySelectorAll('#dataTableBody tr').forEach(tr => {
-                if(tr.classList.contains('tr-data')) {
+                if (tr.classList.contains('tr-data')) {
                     const td = document.createElement('td');
                     td.innerHTML = '<input type="text">';
                     tr.insertBefore(td, tr.children[idx]);
-                } else if(tr.classList.contains('tr-sub')) {
+                } else if (tr.classList.contains('tr-sub')) {
                     tr.querySelector('td').colSpan = window.tableCols.length;
                 }
             });
@@ -1296,18 +1331,18 @@ Item tested were found complied to specification.</textarea>
         }
 
         function removeColAt(idx) {
-            if(window.tableCols.length <= 1) return alert("Cannot remove all columns.");
-            if(!confirm("Remove column " + window.tableCols[idx].t + "?")) return;
+            if (window.tableCols.length <= 1) return alert("Cannot remove all columns.");
+            if (!confirm("Remove column " + window.tableCols[idx].t + "?")) return;
             window.tableCols.splice(idx, 1);
             document.querySelectorAll('#dataTableBody tr').forEach(tr => {
-                if(tr.classList.contains('tr-data')) tr.removeChild(tr.children[idx]);
-                else if(tr.classList.contains('tr-sub')) tr.querySelector('td').colSpan = window.tableCols.length;
+                if (tr.classList.contains('tr-data')) tr.removeChild(tr.children[idx]);
+                else if (tr.classList.contains('tr-sub')) tr.querySelector('td').colSpan = window.tableCols.length;
             });
             renderHeaders();
         }
 
         function addDataColumn() { insertColAt(window.tableCols.length); }
-        
+
         // Initial setup
         renderHeaders();
 
@@ -1390,17 +1425,17 @@ Item tested were found complied to specification.</textarea>
             const pdfThead = document.querySelector('#p2_gen_table thead');
             const dataTheadSrc = document.querySelector('#dataTableWrapper thead');
             pdfThead.innerHTML = dataTheadSrc.innerHTML;
-            
+
             // Clean up PDF headers
             pdfThead.querySelectorAll('tr.no-print').forEach(r => r.remove());
             pdfThead.querySelectorAll('th').forEach((th, idx) => {
                 th.removeAttribute('contenteditable');
-                th.style.borderTop = 'none'; 
+                th.style.borderTop = 'none';
                 th.style.verticalAlign = 'middle';
                 if (th.innerText.trim() === 'S/N') th.style.borderLeft = 'none';
                 if (th.classList.contains('del-col')) th.remove();
             });
-            
+
             const tbSrc = document.getElementById('dataTableBody');
 
             Array.from(tbSrc.children).forEach(r => {
@@ -1443,25 +1478,138 @@ Item tested were found complied to specification.</textarea>
             const client = document.getElementById('r_client').value.trim() || 'Client';
             const fn = `${client}_MSE_Report_${d.getDate()}${d.getMonth() + 1}${d.getFullYear()}_${d.getHours()}${d.getMinutes()}.pdf`;
 
+            // Prepare for PDF export: remove margins
+            const pages = document.querySelectorAll('.page');
+            const originalMargins = [];
+            pages.forEach((p, i) => {
+                originalMargins[i] = p.style.marginBottom;
+                p.style.marginBottom = '0';
+            });
+
             const opt = {
                 margin: 0,
                 filename: fn,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
-            html2pdf().set(opt).from(document.getElementById('report-container')).save();
+            
+            html2pdf().set(opt).from(document.getElementById('report-container')).save().then(() => {
+                // Restore margins for preview
+                pages.forEach((p, i) => {
+                    p.style.marginBottom = originalMargins[i];
+                });
+            });
         }
 
-        function downloadWord() {
+        async function downloadWord() {
             const d = new Date();
             const client = document.getElementById('r_client').value.trim() || 'Client';
             const fn = `${client}_MSE_Report.doc`;
 
-            // Simple HTML to Word construct
-            const html = document.getElementById('report-container').outerHTML;
+            showLoader();
+
+            // Prepare a clone for Word export
+            const originalReport = document.getElementById('report-container');
+            const clone = originalReport.cloneNode(true);
+            
+            // Helper to convert img src to base64
+            const toBase64 = async (img) => {
+                if (!img.src || img.src.startsWith('data:')) return;
+                try {
+                    const response = await fetch(img.src);
+                    const blob = await response.blob();
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            img.src = reader.result;
+                            resolve();
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (e) { console.warn(e); }
+            };
+
+            const allImgs = Array.from(clone.querySelectorAll('img'));
+            await Promise.all(allImgs.map(img => toBase64(img)));
+
+            // WORD OPTIMIZATION:
+            // 1. Convert absolute positioned headers/footers to flow for Word
+            clone.querySelectorAll('.page').forEach(page => {
+                page.style.width = '700px'; 
+                page.style.height = 'auto';
+                page.style.padding = '0';
+                page.style.margin = '0 0 50px 0';
+                page.style.border = 'none';
+
+                const content = page.querySelector('.page-content');
+                if (content) {
+                    content.style.padding = '10px 0';
+                    content.style.height = 'auto';
+                }
+
+                // Move images to top/bottom of the page container for flow
+                const headerImg = page.querySelector('.report-header-img');
+                const footerImg = page.querySelector('.report-footer-img');
+                
+                if (headerImg) {
+                    headerImg.style.position = 'static';
+                    headerImg.style.width = '100%';
+                    headerImg.style.marginBottom = '10px';
+                    page.insertBefore(headerImg, page.firstChild);
+                }
+                if (footerImg) {
+                    footerImg.style.position = 'static';
+                    footerImg.style.width = '100%';
+                    footerImg.style.marginTop = '20px';
+                    page.appendChild(footerImg);
+                }
+            });
+
+            // Ensure titles and meta are visible
+            clone.querySelectorAll('.top-right-meta').forEach(meta => {
+                meta.style.position = 'static';
+                meta.style.textAlign = 'right';
+                meta.style.width = '100%';
+                meta.style.marginBottom = '15px';
+            });
+
+            const html = clone.outerHTML;
             const pre = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>`;
+        <head><meta charset='utf-8'><title>MSE Report</title>
+        <style>
+            @page { size: A4; margin: 0.5in; }
+            body { font-family: Arial, sans-serif; font-size: 11px; }
+            .page { width: 100%; page-break-after: always; }
+            .report-body { border: 2.5pt solid black; width: 100%; margin-top: 10px; }
+            .report-section { border-bottom: 1.5pt solid black; padding: 10px; }
+            .report-section:last-child { border-bottom: none; }
+            
+            table { border-collapse: collapse; width: 100%; border: none; }
+            td, th { padding: 4px; border: none; }
+            
+            /* Detailed Page 2 Table Lines */
+            .p2-table { border: 1pt solid black; margin-top: 10px; }
+            .p2-table td, .p2-table th { border: 0.5pt solid black !important; text-align: center; font-size: 9px; }
+            
+            /* Signature Table Lines */
+            .sig-table { width: 100%; border-top: 2pt solid black; margin-top: 0; }
+            .sig-table td { border-right: 1.5pt solid black; border-bottom: none; vertical-align: top; padding: 5px; width: 25%; }
+            .sig-table td:last-child { border-right: none; }
+            
+            .sig-role { font-weight: bold; margin-bottom: 2px; font-size: 10px; }
+            .sig-name { font-size: 10px; min-height: 20px; }
+            .sig-img-box { height: 60px; text-align: center; vertical-align: middle; }
+            .sig-date { font-size: 9px; border-top: 1pt dotted #666; margin-top: 5px; padding-top: 2px; font-weight: bold; }
+            
+            .report-title { font-size: 16px; font-weight: bold; text-align: center; text-decoration: underline; margin-bottom: 10px; }
+            .report-table td { font-size: 11px; }
+            .label-cell { width: 180px; font-weight: normal; }
+            .colon-cell { width: 20px; text-align: center; }
+            .value-cell { font-weight: normal; }
+        </style>
+        </head><body>`;
             const post = "</body></html>";
             const blob = new Blob(['\ufeff', pre + html + post], { type: 'application/msword' });
 
@@ -1472,6 +1620,7 @@ Item tested were found complied to specification.</textarea>
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            hideLoader();
         }
 
         // Google Drive saving
@@ -1488,15 +1637,29 @@ Item tested were found complied to specification.</textarea>
 
             // Generate base64 PDF
             showLoader();
-            const opt = {
-                margin: 0, filename: fn,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
             try {
+                // Prepare for PDF export: remove margins
+                const pages = document.querySelectorAll('.page');
+                const originalMargins = [];
+                pages.forEach((p, i) => {
+                    originalMargins[i] = p.style.marginBottom;
+                    p.style.marginBottom = '0';
+                });
+
+                const opt = {
+                    margin: 0, filename: fn,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
                 const pdfBlobString = await html2pdf().set(opt).from(document.getElementById('report-container')).outputPdf('datauristring');
+
+                // Restore margins
+                pages.forEach((p, i) => {
+                    p.style.marginBottom = originalMargins[i];
+                });
 
                 const payload = {
                     fileBase64: pdfBlobString,
